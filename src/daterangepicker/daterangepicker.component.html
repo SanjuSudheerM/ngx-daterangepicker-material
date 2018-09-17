@@ -16,10 +16,12 @@
                     [disabled]="disableRange(range)"
                     [ngClass]="{'active': range === chosenRange}">{{range}}</button>
           </li>
+          <li (click)="generateQuarters()">Quarterly</li>
+          <li (click)="generateYearly()">Yearly</li>
         </ul>
-    </div>  
+    </div>
     <div class="calendar" [ngClass]="{right: singleDatePicker, left: !singleDatePicker}"
-        *ngIf="showCalInRanges">
+        *ngIf="showCalInRanges && !showQuarter && !showYears">
         <div class="calendar-table">
             <table class="table-condensed" *ngIf="calendarVariables">
                 <thead>
@@ -35,7 +37,7 @@
                         <th colspan="5" class="month drp-animate">
                             <ng-container *ngIf="showDropdowns && calendarVariables.left.dropdowns">
                                     <select class="monthselect" (change)="monthChanged($event, 'left')">
-                                            <option 
+                                            <option
                                             [disabled]="(calendarVariables.left.dropdowns.inMinYear && m < calendarVariables.left.minDate.month()) || (calendarVariables.left.dropdowns.inMaxYear && m > calendarVariables.left.maxDate.month())"
                                             *ngFor="let m of calendarVariables.left.dropdowns.monthArrays" [value]="m" [selected]="calendarVariables.left.dropdowns.currentMonth == m">
                                                 {{locale.monthNames[m]}}
@@ -83,8 +85,7 @@
         </div>
     </div>
     <div class="calendar right"
-        *ngIf="showCalInRanges && !singleDatePicker"
-        >
+        *ngIf="showCalInRanges && !singleDatePicker && !showQuarter && !showYears">
         <div class="calendar-table">
             <table class="table-condensed" *ngIf="calendarVariables">
                 <thead>
@@ -100,7 +101,7 @@
                         <th colspan="5" class="month">
                             <ng-container *ngIf="showDropdowns && calendarVariables.right.dropdowns">
                                     <select class="monthselect" (change)="monthChanged($event, 'right')">
-                                            <option 
+                                            <option
                                             [disabled]="(calendarVariables.right.dropdowns.inMinYear && m < calendarVariables.right.minDate.month()) || (calendarVariables.right.dropdowns.inMaxYear && m > calendarVariables.right.maxDate.month())"
                                             *ngFor="let m of calendarVariables.right.dropdowns.monthArrays" [value]="m" [selected]="calendarVariables.right.dropdowns.currentMonth == m">
                                                 {{locale.monthNames[m]}}
@@ -146,6 +147,43 @@
             </table>
         </div>
     </div>
+    <div class="calender right" *ngIf="showQuarter || showQuarterOnYear">
+      <div class="quarter-wrapper">
+        <table>
+          <tr>
+            <td (click)="selectQuarter(1, 3)" class="year">
+              <span>JAN - MAR</span>
+            </td>
+            <td (click)="selectQuarter(4, 6)" class="year">
+                <span>APR - JUN</span>
+            </td>
+          </tr>
+          <tr>
+            <td (click)="selectQuarter(7, 9)" class="year">
+                <span>JUL - SEP</span>
+            </td>
+            <td (click)="selectQuarter(10, 12)" class="year">
+                <span>OCT - DEC</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="calender right" *ngIf="showYears">
+        <div class="year-wrapper">
+            <span (click)="generatePreviousYears()"><</span>
+            {{yearsArr[0][0]}} - {{yearsArr[4][4]}}
+            <span (click)="generateNextYears()">></span>
+        </div>
+          <table class="table-condensed">
+            <tr  *ngFor = "let years of yearsArr">
+              <td *ngFor="let y of years" class="year">
+                <span (click)="selectYear(y)">{{y}}</span>
+              </td>
+            </tr>
+          </table>
+
+      </div>
     <div class="buttons" *ngIf="!autoApply && ( !rangesArray.length || (showCalInRanges && !singleDatePicker))">
         <div class="buttons_input">
             <button  *ngIf="showClearButton" class="btn btn-default clear" type="button" (click)="clear()" title="clear the date">
